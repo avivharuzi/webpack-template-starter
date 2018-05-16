@@ -1,0 +1,15 @@
+{
+  "name": "template-starter",
+  "version": "1.0.0",
+  "description": "template starter with webpack config all ready to go with",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Aviv Haruzi",
+  "license": "MIT",
+  "devDependencies": {
+    "webpack": "^4.8.3",
+    "webpack-cli": "^2.1.3"
+  }
+}
