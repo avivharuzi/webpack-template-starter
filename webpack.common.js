@@ -5,6 +5,11 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   entry: './src/main.js',
+  resolve: {
+    alias: {
+      '@': path.join(__dirname, 'src')
+    }
+  },
   module: {
     rules: [{
         test: /\.css$/,
