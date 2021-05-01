@@ -1,65 +1,97 @@
-const path = require('path');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const json5 = require('json5');
+const path = require('path');
+const toml = require('toml');
+const yaml = require('yamljs');
 
+// noinspection WebpackConfigHighlighting
 module.exports = {
-  entry: './src/main.js',
-  resolve: {
-    alias: {
-      '@': path.join(__dirname, 'src')
-    }
-  },
-  module: {
-    rules: [{
-        test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader'
-        ]
-      },
-      {
-        test: /\.scss$/,
-        use: [
-          process.env.NODE_ENV !== 'production' ? 'style-loader' : MiniCssExtractPlugin.loader,
-          'css-loader',
-          'sass-loader'
-        ]
-      },
-      {
-        test: /\.(png|svg|jpg|gif)$/,
-        use: [
-          'file-loader'
-        ]
-      },
-      {
-        test: /\.(woff|woff2|eot|ttf|otf)$/,
-        use: [
-          'file-loader'
-        ]
-      },
-      {
-        test: /\.js?$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: {
-          presets: ['env', 'stage-2']
-        }
-      }
-    ]
+  entry: './src/main.ts',
+  devServer: {
+    contentBase: './dist',
   },
   plugins: [
-    new CleanWebpackPlugin(['dist']),
-    new MiniCssExtractPlugin({
-      filename: '[name].[hash].css',
-      chunkFilename: '[id].[hash].css'
-    }),
     new HtmlWebpackPlugin({
-      template: './src/index.html'
-    })
+      template: './src/index.html',
+      favicon: './src/favicon.ico'
+    }),
   ],
   output: {
-    filename: '[hash].bundle.js',
-    path: path.resolve(__dirname, 'dist')
-  }
+    filename: '[name].[contenthash].js',
+    path: path.resolve(__dirname, 'dist'),
+    clean: true,
+  },
+  optimization: {
+    moduleIds: 'deterministic',
+    runtimeChunk: 'single',
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all',
+        },
+      },
+    },
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          // Creates `style` nodes from JS strings
+          'style-loader',
+          // Translates CSS into CommonJS
+          'css-loader',
+          // Compiles Sass to CSS
+          'sass-loader',
+        ],
+      },
+      {
+        test: /\.(png|svg|jpg|jpeg|gif)$/i,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.(csv|tsv)$/i,
+        use: ['csv-loader'],
+      },
+      {
+        test: /\.xml$/i,
+        use: ['xml-loader'],
+      },
+      {
+        test: /\.toml$/i,
+        type: 'json',
+        parser: {
+          parse: toml.parse,
+        },
+      },
+      {
+        test: /\.yaml$/i,
+        type: 'json',
+        parser: {
+          parse: yaml.parse,
+        },
+      },
+      {
+        test: /\.json5$/i,
+        type: 'json',
+        parser: {
+          parse: json5.parse,
+        },
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+  },
 };
